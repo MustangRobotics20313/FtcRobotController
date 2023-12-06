@@ -25,7 +25,7 @@ public class PPViperCopy extends LinearOpMode {
         DcMotor BackRight = hardwareMap.dcMotor.get("backRight");
         //this copy excludes viper motor from original program, superfluous to strafing
 
-        waitForStart()
+        waitForStart();
 
         while (opModeIsActive()) {
             telemetry.addData("Status", "Running");

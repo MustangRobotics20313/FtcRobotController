@@ -1,20 +1,29 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 @TeleOp
-public class LinearActuatorTest extends LinearOpMode{
+public class RevChassisDriveEncoder extends LinearOpMode {
 
     private DcMotor fl;
     private DcMotor fr;
     private DcMotor rl;
     private DcMotor rr;
-    private DcMotor hangMotor;
+    private Servo servoPixel;
+    private DcMotorEx motorB;
+    private DcMotorEx motorT;
 
     @Override
     public void runOpMode() {
+
         fl = hardwareMap.get(DcMotor.class, "fl");
         fr = hardwareMap.get(DcMotor.class, "fr");
         rl = hardwareMap.get(DcMotor.class, "rl");
@@ -23,14 +32,24 @@ public class LinearActuatorTest extends LinearOpMode{
         fr.setDirection(DcMotor.Direction.REVERSE);
         rr.setDirection(DcMotor.Direction.REVERSE);
 
-        hangMotor = hardwareMap.dcMotor.get("hangMotor");
+        servoPixel = hardwareMap.servo.get("servoPixel");
+        servoPixel.scaleRange(0.0,1.0); //sets min and max number for servo
+
+        motorB = hardwareMap.get(DcMotorEx.class,"bjoint");
+        motorT = hardwareMap.get(DcMotorEx.class,"midjoint");
+
+        motorT.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motorB.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
         //Code during initialization
 
-        while (opModeIsActive()) {
+
+        while(opModeIsActive()) {
 
             mecanum(0.75);
+            joints();
+            grabber();
 
             telemetry.addData("Front left power\t: ", fl.getPower());
             telemetry.addData("Front right power\t: ", fl.getPower());
@@ -40,13 +59,8 @@ public class LinearActuatorTest extends LinearOpMode{
 
             telemetry.update();
 
-            if (gamepad1.a) {
-                hangMotor.setPower(0.5);
-            }
 
-            if (gamepad1.b) {
-                hangMotor.setPower(0.5);
-            }
+
 
         }
     }
@@ -65,6 +79,34 @@ public class LinearActuatorTest extends LinearOpMode{
         fr.setPower(v2 * 0.75 * multiplier);
         rl.setPower(v3 * 0.75 * multiplier);
         rr.setPower(v4 * 0.75 * multiplier);
-
     }
+
+    private void joints() {
+        if(gamepad1.y){
+            motorB.setPower(.5); //moves up
+        }else if(gamepad1.x){
+            motorB.setPower(-.5); //moves down
+        }else{
+            motorB.setPower(0);
+        }
+        if(gamepad1.b){
+            motorT.setPower(.5); //moves up
+        }else if(gamepad1.a){
+            motorT.setPower(-.5); //moves down
+        }else{
+            motorT.setPower(0);
+
+        }
+    }
+
+    private void grabber() {
+        if (gamepad1.left_stick_button) {
+            servoPixel.setPosition(0.2);
+        } else if (gamepad1.right_stick_button) {
+            servoPixel.setPosition(0.5);
+        }
+    }
+
+
+
 }
