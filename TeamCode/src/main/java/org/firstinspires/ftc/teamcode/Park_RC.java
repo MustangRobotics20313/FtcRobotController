@@ -15,7 +15,6 @@ public class Park_RC extends LinearOpMode {
     private DcMotor rl;
     private DcMotor fl;
     private DcMotor c1;
-    private DcMotor c2;
 
     @Override
     public void runOpMode() {
@@ -24,10 +23,10 @@ public class Park_RC extends LinearOpMode {
         rl = hardwareMap.get(DcMotor.class, "rl");
         fl = hardwareMap.get(DcMotor.class, "fl");
         c1 = hardwareMap.get(DcMotor.class, "c1");
-        c2 = hardwareMap.get(DcMotor.class, "c2");
+
 
         fr.setDirection(DcMotor.Direction.REVERSE);
-        rr.setDirection(DcMotor.Direction.REVERSE);
+        rl.setDirection(DcMotor.Direction.REVERSE);
 
 
         waitForStart();
@@ -84,12 +83,12 @@ public class Park_RC extends LinearOpMode {
         sleep(200);
 
         c1.setPower(0.5);
-        c2.setPower(-0.5);
+
 
         sleep(500);
 
         c1.setPower(0);
-        c2.setPower(0);
+
 
 
 

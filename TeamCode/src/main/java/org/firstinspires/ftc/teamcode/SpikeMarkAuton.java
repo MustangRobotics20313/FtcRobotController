@@ -27,12 +27,12 @@ import org.openftc.easyopencv.OpenCvWebcam;
 @Autonomous
 public class SpikeMarkAuton extends LinearOpMode {
 
-    private DcMotor rr;
+    /* private DcMotor rr;
     private DcMotor fr;
     private DcMotor rl;
     private DcMotor fl;
     private DcMotor c1;
-    private DcMotor c2;
+    private DcMotor c2; */
     OpenCvWebcam webcam;
     public String position;
 
@@ -43,7 +43,7 @@ public class SpikeMarkAuton extends LinearOpMode {
         FtcDashboard dashboard = FtcDashboard.getInstance();
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        rr = hardwareMap.get(DcMotor.class, "rr");
+        /* rr = hardwareMap.get(DcMotor.class, "rr");
         fr = hardwareMap.get(DcMotor.class, "fr");
         rl = hardwareMap.get(DcMotor.class, "rl");
         fl = hardwareMap.get(DcMotor.class, "fl");
@@ -51,7 +51,7 @@ public class SpikeMarkAuton extends LinearOpMode {
         //c2 = hardwareMap.get(DcMotor.class, "c2");
 
         fr.setDirection(DcMotor.Direction.REVERSE);
-        rr.setDirection(DcMotor.Direction.REVERSE);
+        rr.setDirection(DcMotor.Direction.REVERSE); */
 
         Pipeline pipeline = new Pipeline();
 

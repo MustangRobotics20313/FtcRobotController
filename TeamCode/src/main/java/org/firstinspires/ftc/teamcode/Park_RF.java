@@ -28,8 +28,7 @@ public class Park_RF extends LinearOpMode {
         c2 = hardwareMap.get(DcMotor.class, "c2");
 
         fr.setDirection(DcMotor.Direction.REVERSE);
-        rr.setDirection(DcMotor.Direction.REVERSE);
-
+        rl.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
 

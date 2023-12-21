@@ -18,7 +18,7 @@ class Pipeline extends OpenCvPipeline {
     double midavgfin;
     String position;
     Mat outPut = new Mat();
-    Scalar rectColor = new Scalar(225.0, 0.0, 0.0);
+    Scalar rectColor = new Scalar(255.0, 0.0, 0.0);
 
     public double laf() { return leftavgfin; }
 

@@ -42,7 +42,7 @@ class Testline extends OpenCvPipeline {
         Rect middleRect = new Rect(210,1,210,359);
         Rect rightRect = new Rect(420,1,210,359);
 
-        
+
         Imgproc.rectangle(outPut,leftRect, rectColor, 2);
         Imgproc.rectangle(outPut,rightRect, rectColor, 2);
         Imgproc.rectangle(outPut, middleRect, rectColor, 2);

@@ -18,12 +18,16 @@ public class TwoDrive extends LinearOpMode {
     private DcMotor rotate;
     private Servo servo;
     private DcMotor c1;
-    private DcMotor c2;
+    private Servo servoDoor;
+    private Servo servoAuton;
+
 
     //private ServoImplEx servo;
 
     double ServoPosition;
     double ServoSpeed;
+
+
 
 
 
@@ -38,17 +42,12 @@ public class TwoDrive extends LinearOpMode {
         lift = hardwareMap.get(DcMotor.class, "lift");
         rotate = hardwareMap.get(DcMotor.class, "rotate");
         servo = hardwareMap.get(Servo.class, "servo");
+        servoDoor = hardwareMap.get(Servo.class, "servoDoor");
+        servoAuton = hardwareMap.get(Servo.class, "servoAuton");
         c1 = hardwareMap.get(DcMotor.class, "c1");
-        c2 = hardwareMap.get(DcMotor.class, "c2");
 
-        //servo = hardwareMap.get(ServoImplEx.class, "servo");
-
-        //servo.setPwmRange(range);
-
-        //intake = hardwareMap.get(DcMotor.class, "intake");
-        //four = hardwareMap.get(DcMotor.class, "four");
-
-
+        fl.setDirection(DcMotor.Direction.REVERSE);
+        rl.setDirection(DcMotor.Direction.REVERSE);
 
 
         waitForStart();
@@ -56,37 +55,30 @@ public class TwoDrive extends LinearOpMode {
 
             //Left Stick: General driving + rotating
 
-            fl.setPower(-gamepad1.left_stick_y);
+            fl.setPower(gamepad1.left_stick_y);
             fr.setPower(gamepad1.left_stick_y);
-            rr.setPower(gamepad1.left_stick_y);
+            rr.setPower(-gamepad1.left_stick_y);
             rl.setPower(-gamepad1.left_stick_y);
 
+            //Rotating
 
-            fl.setPower(-gamepad1.left_stick_x);
+            fl.setPower(gamepad1.left_stick_x);
             fr.setPower(-gamepad1.left_stick_x);
             rr.setPower(-gamepad1.left_stick_x);
-            rl.setPower(-gamepad1.left_stick_x);
+            rl.setPower(gamepad1.left_stick_x);
 
 
             //Right Stick: Straffing
 
 
             fl.setPower(gamepad1.right_stick_x);
-            fr.setPower(gamepad1.right_stick_x);
-            rr.setPower(-gamepad1.right_stick_x);
+            fr.setPower(-gamepad1.right_stick_x);
+            rr.setPower(gamepad1.right_stick_x);
             rl.setPower(-gamepad1.right_stick_x);
 
             //Lift
 
-            if (gamepad2.x == true ) {
-                lift.setPower(2);
-            } else if (gamepad2.b == true) {
-                lift.setPower(-2);
-            } else {
-                lift.setPower(0);
-            }
-
-
+            lift.setPower(-gamepad2.left_stick_y);
 
             //Rotating arm
 
@@ -99,30 +91,44 @@ public class TwoDrive extends LinearOpMode {
             }
 
 
-            //Servo
-
-            /*ServoPosition = 0.5;
-            ServoSpeed = 0.01;
-
-            if (gamepad1.y) {
-            ServoPosition += ServoSpeed;
-            }
-            if (gamepad1.a) {
-            ServoPosition += -ServoSpeed;
-            }
-
-            ServoPosition = Math.min(Math.max(ServoPosition, 0), 1);
-            servo.setPosition(ServoPosition);
-
-            sleep(20); */
+            //Servos
 
             servo.scaleRange(0,1);
+            servoDoor.scaleRange(0,1);
+            servoAuton.scaleRange(0,1);
+
+            //drone launching servo
 
             if (gamepad1.b == true){
-                servo.setPosition(1);
+                servo.setPosition(0);
             }
             else {
-                servo.setPosition(0.5);
+                servo.setPosition(1);
+            }
+
+            //autonomous servo
+
+            if (gamepad2.b == true){
+                servoAuton.setPosition(0);
+            }
+
+            else if (gamepad2.x == true){
+                servoAuton.setPosition(0.5);
+
+            }
+
+            //door servo
+
+            if (gamepad2.dpad_down){
+                servoDoor.setPosition(0.75);
+            }
+
+            else if (gamepad2.dpad_up){
+                servoDoor.setPosition(0.6);
+            }
+
+            else {
+                servoDoor.setPosition(0.6);
             }
 
 
@@ -130,15 +136,15 @@ public class TwoDrive extends LinearOpMode {
 
             if (gamepad2.left_bumper) {
                 c1.setPower(0.5);
-                c2.setPower(-0.5);
+
 
             } else if (gamepad2.right_bumper) {
                 c1.setPower(-1);
-                c2.setPower(1);
+
 
             } else {
                 c1.setPower(0);
-                c2.setPower(0);
+
             }
 
             telemetry.addData("Front left power\t: ", fl.getPower());
@@ -146,7 +152,6 @@ public class TwoDrive extends LinearOpMode {
             telemetry.addData("Rear left power\t: ", fl.getPower());
             telemetry.addData("Front left power\t: ", fl.getPower());
             telemetry.addData("c1\t: ", c1.getPower());
-            telemetry.addData("c2\t: ", c2.getPower());
             telemetry.update();
 
 
