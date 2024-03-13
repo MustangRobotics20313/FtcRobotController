@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -70,7 +68,7 @@ public class TestDrive extends LinearOpMode {
         waitForStart();
         while(opModeIsActive()) {
 
-            mechanumDrive();
+            mecanumDrive();
 
             if (gamepad1.dpad_up) {
                 speed = "fast";
@@ -83,36 +81,7 @@ public class TestDrive extends LinearOpMode {
             }
 
 
-            /*
-            //Left Stick: General driving + rotating
-
-            fl.setPower(gamepad1.left_stick_y*1.5);
-            fr.setPower(gamepad1.left_stick_y *1.5);
-            rr.setPower(gamepad1.left_stick_y *1.5);
-            rl.setPower(gamepad1.left_stick_y *1.5);
-
-            //Rotating
-
-            fl.setPower(gamepad1.left_stick_x* 1.5);
-            fr.setPower(-gamepad1.left_stick_x* 1.5);
-            rr.setPower(-gamepad1.left_stick_x * 1.5);
-            rl.setPower(gamepad1.left_stick_x * 1.5);
-
-
-            //Right Stick: Straffing
-
-
-            fl.setPower(-gamepad1.right_stick_x * 1.5);
-            fr.setPower(gamepad1.right_stick_x * 1.5);
-            rr.setPower(-gamepad1.right_stick_x * 1.5);
-            rl.setPower(gamepad1.right_stick_x * 1.5);
-
-
-             */
-
-
             //Lift
-
             lift.setPower(-gamepad2.left_stick_y);
 
             if (gamepad2.left_stick_y == 0) {
@@ -209,7 +178,7 @@ public class TestDrive extends LinearOpMode {
 
     }
 
-    private void mechanumDrive(){
+    private void mecanumDrive(){
 
         speed = "fast";
 
