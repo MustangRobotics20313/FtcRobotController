@@ -19,6 +19,7 @@ import java.util.List;
 
 
 @Autonomous(name = "Tensor_BF", group = "Concept")
+@Disabled
 
 public class Tensor_BF extends LinearOpMode {
 

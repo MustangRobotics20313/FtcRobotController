@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -7,35 +8,36 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp
 @Config
+@Disabled
+
 public class EncoderTwoDrive extends LinearOpMode {
 
     private DcMotor fl;
     private DcMotor fr;
     private DcMotor rl;
     private DcMotor rr;
-    private DcMotor lift;
+    private DcMotor slide;
     private DcMotor rotate;
+    private DcMotor rig;
     private Servo servo;
-    private Servo servoDoor;
-    private DcMotor c1;
+    private Servo servoBoard;
+    private TouchSensor touch;
 
-
-
-
-    double ServoPosition;
-    double ServoSpeed;
 
     //units of ticks
 
-    private final int PIXEL_RELEASE_POSITION = 4500;
-    private final int HANGING_POSITION = 3860;
+    private final int HEIGHT_1 = 900;
+    private final int HEIGHT_2 = 1200;
+    private final int HEIGHT_3 = 1400;
+    private final int ZERO = 0;
 
 
-    private final double ROTATE_POWER = 0.75;
-    public static int encoderPosition = 4500;
+    private final double SLIDE_POWER = 0.5;
+    public final double LIFT_POWER = 0.75;
 
     @Override
     public void runOpMode() {
@@ -43,23 +45,40 @@ public class EncoderTwoDrive extends LinearOpMode {
         fr = hardwareMap.get(DcMotor.class, "fr");
         rl = hardwareMap.get(DcMotor.class, "rl");
         rr = hardwareMap.get(DcMotor.class, "rr");
-        lift = hardwareMap.get(DcMotor.class, "lift");
-        rotate = hardwareMap.get(DcMotor.class, "rotate");
+        slide = hardwareMap.get(DcMotor.class, "slide");
+        //rotate = hardwareMap.get(DcMotor.class, "rotate");
+        rig = hardwareMap.get(DcMotor.class, "rig");
         servo = hardwareMap.get(Servo.class, "servo");
-        servoDoor = hardwareMap.get(Servo.class, "servoDoor");
-        c1 = hardwareMap.get(DcMotor.class, "c1");
+        servoBoard = hardwareMap.get(Servo.class, "servoBoard");
+        touch = hardwareMap.get(TouchSensor.class, "touch");
 
-
+        rr.setDirection(DcMotor.Direction.REVERSE);
         fl.setDirection(DcMotor.Direction.REVERSE);
-        rl.setDirection(DcMotor.Direction.REVERSE);
-        rotate.setDirection(DcMotor.Direction.REVERSE);
 
-        rotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        String direction = "collection";
 
         waitForStart();
         while(opModeIsActive()) {
 
+            //Switching directions
 
+            /* if (gamepad1.x){
+                if (direction == "collection") {
+                    fr.setDirection(DcMotor.Direction.REVERSE);
+                    rr.setDirection(DcMotor.Direction.REVERSE);
+                    direction = "scoring";
+
+                }
+
+                else if (direction == "scoring"){
+                    fl.setDirection(DcMotor.Direction.REVERSE);
+                    rl.setDirection(DcMotor.Direction.REVERSE);
+                    direction = "collection";
+
+                }
+            } */
 
             //Left Stick: General driving + rotating
 
@@ -68,115 +87,141 @@ public class EncoderTwoDrive extends LinearOpMode {
             rr.setPower(-gamepad1.left_stick_y);
             rl.setPower(-gamepad1.left_stick_y);
 
+            //Rotating
 
             fl.setPower(gamepad1.left_stick_x);
             fr.setPower(-gamepad1.left_stick_x);
-            rr.setPower(-gamepad1.left_stick_x);
-            rl.setPower(gamepad1.left_stick_x);
+            rr.setPower(gamepad1.left_stick_x);
+            rl.setPower(-gamepad1.left_stick_x);
 
+            //Right Stick: Straffing
 
-            //Right Stick: Strafing
-
-
-            fl.setPower(gamepad1.right_stick_x);
-            fr.setPower(-gamepad1.right_stick_x);
+            fl.setPower(-gamepad1.right_stick_x);
+            fr.setPower(gamepad1.right_stick_x);
             rr.setPower(gamepad1.right_stick_x);
             rl.setPower(-gamepad1.right_stick_x);
 
-            //Lift
+            //slide
 
-            lift.setPower(-gamepad2.left_stick_y);
+            slide();
 
-
-            //Rotating arm
-
-            rotate();
             // resetting rotate encoder
-            if (gamepad2.y) {
-                rotate.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            if (touch.isPressed()) {
+                slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             }
 
+            // rotating + rigging
+
+            if (gamepad2.left_stick_y > 0){
+                rig.setPower(-1);
+            }
+
+            else if (gamepad2.left_stick_y < 0){
+                rig.setPower(1);
+            }
+
+            else {
+                rig.setPower(0);
+            }
+
+            /* if (gamepad2.left_bumper){
+                rotate.setPower(-0.75);
+            }
+
+            else if (gamepad2.right_bumper){
+                rotate.setPower(0.75);
+            }
+            else {
+                rotate.setPower(0);
+            } */
 
             //Servos
 
             servo.scaleRange(0,1);
-            servoDoor.scaleRange(0,1);
+            servoBoard.scaleRange(0,1);
+            //servoDoor.scaleRange(0,1);
 
             if (gamepad1.b == true){
-                servo.setPosition(1);
+                servo.setPosition(0.3);
             }
             else {
-                servo.setPosition(0);
+                servo.setPosition(0.7);
             }
 
-            if (gamepad2.dpad_down){
-                servoDoor.setPosition(0.75);
+            if (gamepad1.dpad_down){
+                servoBoard.setPosition(0);
             }
 
-            else if (gamepad2.dpad_up){
-                servoDoor.setPosition(0.6);
+            else if (gamepad1.dpad_up){
+                servoBoard.setPosition(1);
             }
 
             else {
-                servoDoor.setPosition(0.6);
-            }
-
-
-            // Compliant wheels
-
-            if (gamepad2.left_bumper) {
-                c1.setPower(0.5);
-
-
-            } else if (gamepad2.right_bumper) {
-                c1.setPower(-1);
-
-
-            } else {
-                c1.setPower(0);
-
+                servoBoard.setPosition(1);
             }
 
             telemetry.addData("Front left power\t: ", fl.getPower());
             telemetry.addData("Front right power\t: ", fl.getPower());
             telemetry.addData("Rear left power\t: ", fl.getPower());
             telemetry.addData("Front left power\t: ", fl.getPower());
-            telemetry.addData("c1\t: ", c1.getPower());
-            telemetry.addData("Rotating encoder\t:", rotate.getCurrentPosition());
+            telemetry.addData("Slide encoder\t", slide.getCurrentPosition());
             telemetry.update();
 
-
         }
-
-
-
 
     }
 
-    private void rotate() {
+    private void slide() {
 
-        if (gamepad2.left_trigger > 0) { //manual control
-            rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rotate.setPower(ROTATE_POWER);
-        } else if (gamepad2.right_trigger > 0) { //manual control
-            rotate.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            rotate.setPower(-ROTATE_POWER);
-        } else if (gamepad2.b) { //parallel to board
-            rotate.setTargetPosition(4500);
-            rotate.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rotate.setPower(-0.75);
-        } else if (gamepad2.y) { //hanging position
-            rotate.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rotate.setTargetPosition(3860);
-            if (rotate.getCurrentPosition() > -3860) {
-                rotate.setPower(-ROTATE_POWER);
-            } else {
-                rotate.setPower(ROTATE_POWER);
+        if (touch.isPressed()){
+            slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        }
+
+        if (gamepad2.dpad_up) { //manual control
+            slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            slide.setPower(0.9);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        } else if (gamepad2.dpad_down) { //manual control
+            slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            slide.setPower(-0.9);
+            slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        } else if (gamepad2.b) { //Height 1
+            slide.setTargetPosition(HEIGHT_1);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            if (slide.getCurrentPosition() > HEIGHT_1){
+                slide.setPower(-LIFT_POWER);
             }
+            else if (slide.getCurrentPosition() < HEIGHT_1){
+                slide.setPower(LIFT_POWER);
+            }
+
         }
 
-        if (gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0 && rotate.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
-            rotate.setPower(0);
+        else if (gamepad2.y) { //Height 2
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setTargetPosition(HEIGHT_2);
+            if (slide.getCurrentPosition() > HEIGHT_2) {
+                slide.setPower(-LIFT_POWER);
+            } else if (slide.getCurrentPosition() < HEIGHT_2){
+                slide.setPower(LIFT_POWER);
+            }
+
+            else if (gamepad2.a) { //Height 2
+                slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                slide.setTargetPosition(ZERO);
+                if (slide.getCurrentPosition() > ZERO) {
+                    slide.setPower(-LIFT_POWER);
+                } else if (slide.getCurrentPosition() < ZERO){
+                    slide.setPower(LIFT_POWER);
+                }
+        }
+
+        if (gamepad2.left_trigger == 0 && gamepad2.right_trigger == 0 && slide.getMode() == DcMotor.RunMode.RUN_WITHOUT_ENCODER) {
+            slide.setPower(0);
         }
     }
-}
+}}

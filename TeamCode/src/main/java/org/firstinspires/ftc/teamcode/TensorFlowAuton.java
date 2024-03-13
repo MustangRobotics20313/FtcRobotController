@@ -19,6 +19,7 @@ import java.util.List;
 
 
 @Autonomous(name = "TensorFlowAuton", group = "Concept")
+@Disabled
 
 public class TensorFlowAuton extends LinearOpMode {
 
