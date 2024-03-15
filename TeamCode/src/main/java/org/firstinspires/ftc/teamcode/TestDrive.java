@@ -1,10 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.ServoImplEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -70,7 +68,7 @@ public class TestDrive extends LinearOpMode {
         waitForStart();
         while(opModeIsActive()) {
 
-            mechanumDrive();
+            mecanumDrive();
 
             if (gamepad1.dpad_up) {
                 speed = "fast";
@@ -209,7 +207,7 @@ public class TestDrive extends LinearOpMode {
 
     }
 
-    private void mechanumDrive(){
+    private void mecanumDrive(){
 
         speed = "fast";
 
