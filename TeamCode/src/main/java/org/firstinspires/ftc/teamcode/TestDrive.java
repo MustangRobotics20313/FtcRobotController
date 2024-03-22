@@ -230,10 +230,10 @@ public class TestDrive extends LinearOpMode {
             rl.setPower(v3 * SPEED_MULTIPLIER);
             rr.setPower(v4 * SPEED_MULTIPLIER);
         } else if (direction == DriveDirection.BACKWARD) {
-            rr.setPower(v1 * SPEED_MULTIPLIER);
-            rl.setPower(v2 * SPEED_MULTIPLIER);
-            fr.setPower(v3 * SPEED_MULTIPLIER);
-            fl.setPower(v4 * SPEED_MULTIPLIER);
+            rr.setPower(-v1 * SPEED_MULTIPLIER);
+            rl.setPower(-v2 * SPEED_MULTIPLIER);
+            fr.setPower(-v3 * SPEED_MULTIPLIER);
+            fl.setPower(-v4 * SPEED_MULTIPLIER);
         }
     }
 
