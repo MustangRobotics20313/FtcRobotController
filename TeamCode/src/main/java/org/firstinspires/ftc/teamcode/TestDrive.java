@@ -9,6 +9,11 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 @TeleOp
 public class TestDrive extends LinearOpMode {
 
+    private enum DriveDirection{
+        FORWARD,
+        BACKWARD
+    }
+
     private DcMotor fl;
     private DcMotor fr;
     private DcMotor rl;
@@ -49,6 +54,8 @@ public class TestDrive extends LinearOpMode {
     public final double LIFT_POWER = 0.75;
 
     //PwmControl.PwmRange range = new PwmControl.PwmRange(usPulseLower.553, usPulseUpper.2425);
+
+    private DriveDirection direction = DriveDirection.FORWARD;
 
     @Override
     public void runOpMode() {
@@ -205,13 +212,11 @@ public class TestDrive extends LinearOpMode {
         twist = gamepad1.left_stick_x;
 
         if (gamepad1.a) {
-            DIRECTION_SWITCH_FB = 1;
-            DIRECTION_SWITCH_S = -1;
-        }
-
-        else if (gamepad1.x) {
-            DIRECTION_SWITCH_FB = -1;
-            DIRECTION_SWITCH_S = 1;
+            if(direction == DriveDirection.FORWARD) {
+                direction = DriveDirection.BACKWARD;
+            } else if(direction == DriveDirection.BACKWARD) {
+                direction = DriveDirection.FORWARD;
+            }
         }
 
         double v1 = drive + strafe - twist;
@@ -219,11 +224,17 @@ public class TestDrive extends LinearOpMode {
         double v3 = drive - strafe - twist;
         double v4 = drive + strafe + twist;
 
-        fl.setPower(v1 * SPEED_MULTIPLIER * DIRECTION_SWITCH_S);
-        fr.setPower(v2 * SPEED_MULTIPLIER * DIRECTION_SWITCH_FB);
-        rl.setPower(v3 * SPEED_MULTIPLIER * DIRECTION_SWITCH_S);
-        rr.setPower(v4 * SPEED_MULTIPLIER * DIRECTION_SWITCH_FB);
-
+        if(direction == DriveDirection.FORWARD) {
+            fl.setPower(v1 * SPEED_MULTIPLIER);
+            fr.setPower(v2 * SPEED_MULTIPLIER);
+            rl.setPower(v3 * SPEED_MULTIPLIER);
+            rr.setPower(v4 * SPEED_MULTIPLIER);
+        } else if (direction == DriveDirection.BACKWARD) {
+            rr.setPower(v1 * SPEED_MULTIPLIER);
+            rl.setPower(v2 * SPEED_MULTIPLIER);
+            fr.setPower(v3 * SPEED_MULTIPLIER);
+            fl.setPower(v4 * SPEED_MULTIPLIER);
+        }
     }
 
 
