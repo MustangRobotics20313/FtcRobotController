@@ -86,6 +86,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 @Autonomous(name="AprilTagTest", group = "Concept")
+@Disabled
 
 
 public class AprilTagTest extends LinearOpMode

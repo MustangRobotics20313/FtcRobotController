@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoImpl;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -12,7 +13,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 @TeleOp
 public class ServoTesting extends LinearOpMode {
     //private Servo servoTest;
-    private Servo servoTest;
+    private Servo servoRotate;
+    private DigitalChannel touch;
 
     double ServoPosition;
     double ServoSpeed;
@@ -23,23 +25,36 @@ public class ServoTesting extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-        servoTest = hardwareMap.get(Servo.class, "servoTest");
+        servoRotate = hardwareMap.get(Servo.class, "servoRotate");
+        //touch = hardwareMap.get(DigitalChannel.class, "touch");
 
         waitForStart();
         while(opModeIsActive()){
 
-            servoTest.scaleRange(0,1);
+            /* if (touch.isPressed()) {
+                telemetry.addData("Touch: ", 1);
+
+            }
+
+            else {
+                telemetry.addData("Touch: ", 0);
+
+            } */
+
+            servoRotate.scaleRange(0,1);
 
             if (gamepad2.dpad_up){
-                servoTest.setPosition(0.75);
+                servoRotate.setPosition(0.75);
             }
 
             else if (gamepad2.dpad_down){
-                servoTest.setPosition(0.25);
+                servoRotate.setPosition(0.85);
             }
 
-            telemetry.addData("Servo Position: ", servoTest.getPosition());
+            telemetry.addData("Servo Position: ", servoRotate.getPosition());
             telemetry.update();
+
+
 
         }
 

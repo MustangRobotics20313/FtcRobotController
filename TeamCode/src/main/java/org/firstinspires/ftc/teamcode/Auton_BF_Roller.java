@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -18,6 +19,7 @@ import java.util.List;
 
 
 @Autonomous(name = "Auton_BF_Roller", group = "Concept")
+@Disabled
 
 public class Auton_BF_Roller extends LinearOpMode {
 

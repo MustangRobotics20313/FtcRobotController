@@ -15,6 +15,8 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 
 @TeleOp
 @Config
+@Disabled
+
 public class SlideTesting extends LinearOpMode {
 
     private DcMotor lift;

@@ -44,16 +44,14 @@ public class Auton_RF extends LinearOpMode {
 
 
     private Servo servoAuton;
-    private Servo servoBoard;
 
 
     @Override
     public void runOpMode() {
 
         servoAuton = hardwareMap.get(Servo.class, "servoAuton");
-        servoBoard = hardwareMap.get(Servo.class, "servoBoard");
         servoAuton.scaleRange(0,1);
-        servoBoard.scaleRange(0,1);
+
 
         initTfod();
 
@@ -78,14 +76,13 @@ public class Auton_RF extends LinearOpMode {
 
         if (opModeIsActive() && !isStopRequested()) {
             while (opModeIsActive()) {
-                visionPortal.close();
 
                 SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
                 Pose2d startPose = new Pose2d(0, 0, (Math.toRadians(90)));
 
-                Vector2d leftSpike = new Vector2d(-4, 30);
-                Vector2d middleSpike = new Vector2d(0, 36.75);
-                Vector2d rightSpike = new Vector2d(8.25, 30);
+                Vector2d leftSpike = new Vector2d(-3, 32);
+                Vector2d middleSpike = new Vector2d(-4, 36.5);
+                Vector2d rightSpike = new Vector2d(3 , 33);
 
                 Vector2d leftBoard = new Vector2d(6, -83);
                 Vector2d middleBoard = new Vector2d(80, 25);
@@ -101,28 +98,24 @@ public class Auton_RF extends LinearOpMode {
                     TrajectorySequence dropLeftSpike = drive.trajectorySequenceBuilder(startPose)
                             .forward(12)
                             .splineTo(leftSpike, Math.toRadians(180))
-                            .waitSeconds(0.5)
-                            .forward(5)
-                            .forward(-7.5)
-                            .strafeRight(1.75)
+                            .forward(2)
+                            .forward(-2)
                             .build();
 
                     drive.followTrajectorySequence(dropLeftSpike);
 
-                    servoAuton.setPosition(0.83);
-                    sleep(2000);
-                    //servoAuton.setPosition(0);
+                    servoAuton.setPosition(0.85);
+                    sleep(1500);
 
                     drive.setPoseEstimate(startPose);
                     TrajectorySequence adjustLeft = drive.trajectorySequenceBuilder(startPose)
-                            .forward(-4)
+                            .forward(-10)
+                            .strafeLeft(25)
                             .build();
 
                     drive.followTrajectorySequence(adjustLeft);
 
                     servoAuton.setPosition(0);
-                    servoBoard.setPosition(0.32);
-                    sleep(2000);
 
                     /* drive.setPoseEstimate(startPose);
                     TrajectorySequence boardLeft = drive.trajectorySequenceBuilder(startPose)
@@ -170,13 +163,13 @@ public class Auton_RF extends LinearOpMode {
 
                     TrajectorySequence dropMiddleSpike = drive.trajectorySequenceBuilder(startPose)
                             .splineTo(middleSpike, Math.toRadians(90))
-                            .forward(-8)
+                            .forward(-7)
                             .build();
 
                     drive.followTrajectorySequence(dropMiddleSpike);
 
-                    servoAuton.setPosition(0.83);
-                    sleep(2000);
+                    servoAuton.setPosition(0.85);
+                    sleep(1500);
                     //servoAuton.setPosition(0);
 
                     drive.setPoseEstimate(startPose);
@@ -186,9 +179,6 @@ public class Auton_RF extends LinearOpMode {
 
                     drive.followTrajectorySequence(adjustMiddle);
 
-                    servoAuton.setPosition(0);
-                    servoBoard.setPosition(0.42);
-                    sleep(2000);
 
                     /* drive.setPoseEstimate(startPose);
                     TrajectorySequence boardMiddle = drive.trajectorySequenceBuilder(startPose)
@@ -234,31 +224,25 @@ public class Auton_RF extends LinearOpMode {
                 else if (position == "right"){
                     //Spline to middle spike mark, drop purple pixel, put yellow pixel on board, park
 
-                    servoBoard.setPosition(0.62);
-
                     TrajectorySequence dropRightSpike = drive.trajectorySequenceBuilder(startPose)
                             .splineTo(rightSpike, Math.toRadians(0))
                             .waitSeconds(0.5)
-                            .forward(5)
-                            .forward(-9)
                             .build();
 
                     drive.followTrajectorySequence(dropRightSpike);
 
-                    servoAuton.setPosition(0.83);
-                    sleep(2000);
+                    servoAuton.setPosition(0.85);
+                    sleep(1500);
                     //servoAuton.setPosition(0);
+
 
                     drive.setPoseEstimate(startPose);
                     TrajectorySequence adjustRight = drive.trajectorySequenceBuilder(startPose)
                             .forward(-10)
+                            .strafeRight(25)
                             .build();
 
                     drive.followTrajectorySequence(adjustRight);
-
-                    servoAuton.setPosition(0);
-                    servoBoard.setPosition(0.42);
-                    sleep(2000);
 
 
                     /* drive.setPoseEstimate(startPose);

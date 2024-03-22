@@ -4,7 +4,9 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -19,6 +21,7 @@ import java.util.List;
 
 
 @Autonomous(name = "Board_BF", group = "Concept")
+@Disabled
 
 public class Board_BF extends LinearOpMode {
 
@@ -42,18 +45,25 @@ public class Board_BF extends LinearOpMode {
     double y;
     String position;
 
-
     private Servo servoAuton;
-    private Servo servoBoard;
+    private Servo servoRotate;
+    private Servo servoPixel;
+    private DcMotor slide;
 
 
     @Override
     public void runOpMode() {
 
+        slide = hardwareMap.get(DcMotor.class, "slide");
         servoAuton = hardwareMap.get(Servo.class, "servoAuton");
-        servoBoard = hardwareMap.get(Servo.class, "servoBoard");
+        servoRotate = hardwareMap.get(Servo.class, "servoRotate");
+        servoPixel = hardwareMap.get(Servo.class, "servoPixel");
         servoAuton.scaleRange(0,1);
-        servoBoard.scaleRange(0,1);
+        servoRotate.scaleRange(0,1);
+        servoPixel.scaleRange(0,1);
+
+        slide.setDirection(DcMotor.Direction.REVERSE);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         initTfod();
 
@@ -121,7 +131,6 @@ public class Board_BF extends LinearOpMode {
                     drive.followTrajectorySequence(adjustLeft);
 
                     servoAuton.setPosition(0);
-                    servoBoard.setPosition(0.42);
                     sleep(2000);
 
                     drive.setPoseEstimate(startPose);
@@ -133,7 +142,11 @@ public class Board_BF extends LinearOpMode {
 
                     drive.followTrajectorySequence(parkLeft);
 
-                    servoBoard.setPosition(0.6);
+                    lift();
+                    servoRotate.setPosition(0.5);
+                    sleep(2000);
+
+                    servoPixel.setPosition(0.4);
                     sleep(2000);
 
                     drive.setPoseEstimate(startPose);
@@ -170,7 +183,7 @@ public class Board_BF extends LinearOpMode {
                     drive.followTrajectorySequence(adjustMiddle);
 
                     servoAuton.setPosition(0);
-                    servoBoard.setPosition(0.5);
+
                     sleep(2000);
 
                     drive.setPoseEstimate(startPose);
@@ -182,7 +195,12 @@ public class Board_BF extends LinearOpMode {
 
                     drive.followTrajectorySequence(parkMiddle);
 
-                    servoBoard.setPosition(0.6);
+                    lift();
+                    servoRotate.setPosition(0.5);
+                    sleep(2000);
+
+                    servoPixel.setPosition(0.4);
+                    sleep(2000);
                     sleep(2000);
 
                     drive.setPoseEstimate(startPose);
@@ -200,7 +218,6 @@ public class Board_BF extends LinearOpMode {
                 else if (position == "right"){
                     //Spline to middle spike mark, drop purple pixel, put yellow pixel on board, park
 
-                    servoBoard.setPosition(0.62);
 
                     TrajectorySequence dropRightSpike = drive.trajectorySequenceBuilder(startPose)
                             .splineTo(rightSpike, Math.toRadians(0))
@@ -223,8 +240,6 @@ public class Board_BF extends LinearOpMode {
                     drive.followTrajectorySequence(adjustRight);
 
                     servoAuton.setPosition(0);
-                    servoBoard.setPosition(0.42);
-                    sleep(2000);
 
 
                     drive.setPoseEstimate(startPose);
@@ -236,7 +251,12 @@ public class Board_BF extends LinearOpMode {
 
                     drive.followTrajectorySequence(parkRight);
 
-                    servoBoard.setPosition(0.6);
+                    lift();
+                    servoRotate.setPosition(0.5);
+                    sleep(2000);
+
+                    servoPixel.setPosition(0.4);
+                    sleep(2000);
                     sleep(2000);
 
                     drive.setPoseEstimate(startPose);
@@ -400,4 +420,20 @@ public class Board_BF extends LinearOpMode {
         return (currentRecognitions.size());
     }
 
-}   // end class
+    public void lift(){
+
+        slide.setTargetPosition(800);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        if (slide.getCurrentPosition() > 800){
+            slide.setPower(-0.5);
+        }
+        else if (slide.getCurrentPosition() < 800){
+            slide.setPower(0.5);
+        }
+
+    }
+
+}
+
+  // end class

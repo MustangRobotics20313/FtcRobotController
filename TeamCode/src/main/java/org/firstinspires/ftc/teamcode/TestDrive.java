@@ -13,15 +13,14 @@ public class TestDrive extends LinearOpMode {
     private DcMotor fr;
     private DcMotor rl;
     private DcMotor rr;
-    private DcMotor lift;
-    private DcMotor rotate;
     private DcMotor slide;
+    private DcMotor lift;
     private Servo servo;
-    private DcMotor c1;
+    private DcMotor intake;
     private Servo servoRotate;
     private Servo servoAuton;
-    private Servo servoBoard;
     private Servo servoPixel;
+    private Servo servoHang;
     private TouchSensor touch;
 
 
@@ -31,11 +30,18 @@ public class TestDrive extends LinearOpMode {
     double ServoSpeed;
     String speed = "standard";
     private double SPEED_MULTIPLIER = 0.5;
+    private double DIRECTION_SWITCH_S = 1;
+    private double DIRECTION_SWITCH_FB= 1;
 
-    private final int HEIGHT_1 = 800;
-    private final int HEIGHT_2 = 400;
-    private final int HEIGHT_3 = 1400;
+    private final int HEIGHT_1 = 1200;
+    private final int HEIGHT_2 = 1600;
+    private final int HEIGHT_3 = 1200;
     private final int ZERO = -20;
+    private int count = 0;
+
+    double drive;
+    double strafe;
+    double twist;
 
 
 
@@ -50,34 +56,41 @@ public class TestDrive extends LinearOpMode {
         fr = hardwareMap.get(DcMotor.class, "fr");
         rl = hardwareMap.get(DcMotor.class, "rl");
         rr = hardwareMap.get(DcMotor.class, "rr");
-        lift = hardwareMap.get(DcMotor.class, "lift");
-        rotate = hardwareMap.get(DcMotor.class, "rotate");
         slide = hardwareMap.get(DcMotor.class, "slide");
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        lift = hardwareMap.get(DcMotor.class, "lift");
         servo = hardwareMap.get(Servo.class, "servo");
         servoAuton = hardwareMap.get(Servo.class, "servoAuton");
         servoRotate = hardwareMap.get(Servo.class, "servoRotate");
-        servoBoard = hardwareMap.get(Servo.class, "servoBoard");
         servoPixel = hardwareMap.get(Servo.class, "servoPixel");
+        servoHang = hardwareMap.get(Servo.class, "servoHang");
         touch = hardwareMap.get(TouchSensor.class, "touch");
 
         fl.setDirection(DcMotor.Direction.REVERSE);
         rl.setDirection(DcMotor.Direction.REVERSE);
+        slide.setDirection(DcMotor.Direction.REVERSE);
 
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         waitForStart();
+
         while(opModeIsActive()) {
+
+            if (count == 0) {
+                servoRotate.setPosition(0.865);
+                count += 1;
+            }
 
             mecanumDrive();
 
             if (gamepad1.dpad_up) {
                 speed = "fast";
-                SPEED_MULTIPLIER = 0.8;
+                SPEED_MULTIPLIER = 0.85;
             }
 
             else if (gamepad1.dpad_down){
                 speed = "slow";
-                SPEED_MULTIPLIER = 0.3;
+                SPEED_MULTIPLIER = 0.5;
             }
 
 
@@ -91,79 +104,86 @@ public class TestDrive extends LinearOpMode {
             //slide
 
             slide();
-            if (touch.isPressed()){
-                slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-            }
 
 
             //Rotating arm
 
-            if (gamepad2.left_trigger >0 ) {
+            /* if (gamepad2.left_trigger >0 ) {
                 rotate.setPower(1);
             } else if (gamepad2.right_trigger >0) {
                 rotate.setPower(-1);
             } else {
                 rotate.setPower(0);
-            }
+            } */
 
 
             //Servos
 
-            servo.scaleRange(0,1);
+            //servo.scaleRange(0,1);
             servoAuton.scaleRange(0,1);
-            servoBoard.scaleRange(0,1);
+            //servoBoard.scaleRange(0,1);
             servoRotate.scaleRange(0,1);
             servoPixel.scaleRange(0,1);
+            servoHang.scaleRange(0,1);
+
 
             //drone launching servo
 
             if (gamepad1.b == true){
-                servo.setPosition(0.1 );
+                servo.setPosition(0.6);
             }
             else {
-                servo.setPosition(0.3);
+                servo.setPosition(0);
             }
-
-            servoBoard.setPosition(0.4);
 
             //pixel servo
 
-            if (gamepad2.left_bumper == true){
-                servoPixel.setPosition(0.27);
+           if (gamepad2.right_bumper){
+                servoPixel.setPosition(0.5);
             }
 
-            else if (gamepad2.right_bumper == true){
-                servoPixel.setPosition(0.6);
+           else{
+               servoPixel.setPosition(0.1);
 
-            }
+           }
 
             //rotating  servo
 
-            if (gamepad2.dpad_down){
-                servoRotate.setPosition(0.45);
+            if (gamepad2.dpad_up) {
+                servoRotate.setPosition(0.745);
             }
 
-            else if (gamepad2.dpad_up) {
-                servoRotate.setPosition(0.2);
+            else if (gamepad2.dpad_down) {
+                servoRotate.setPosition(0.865);
             }
 
+            //hanging servo
+
+            if (gamepad2.x){
+                servoHang.setPosition(0.5);
+            }
+
+            else {
+               servoHang.setPosition(0);
+            }
+
+            //
+
+            // Intake system
+
+            if (gamepad1.right_trigger > 0) {
+                intake.setPower(1);
+                servoPixel.setPosition(0.5);
 
 
-            // Compliant wheels
-
-            /* if (gamepad2.left_bumper) {
-                c1.setPower(1);
-
-
-            } else if (gamepad2.right_bumper) {
-                c1.setPower(-0.5);
+            } else if (gamepad1.left_trigger > 0) {
+                intake.setPower(-0.5);
 
 
             } else {
-                c1.setPower(0);
+                intake.setPower(0);
 
-            } */
+            }
 
             telemetry.addData("Front left power\t: ", fl.getPower());
             telemetry.addData("Front right power\t: ", fl.getPower());
@@ -178,25 +198,31 @@ public class TestDrive extends LinearOpMode {
 
     }
 
-    private void mecanumDrive(){
+    private void mecanumDrive() {
 
-        speed = "fast";
+        drive = gamepad1.left_stick_y ;
+        strafe = -gamepad1.right_stick_x;
+        twist = gamepad1.left_stick_x;
 
-        //speedier driving?!?! idk let's find out
+        if (gamepad1.a) {
+            DIRECTION_SWITCH_FB = 1;
+            DIRECTION_SWITCH_S = -1;
+        }
 
-        double drive = gamepad1.left_stick_y;
-        double strafe = -gamepad1.right_stick_x;
-        double twist = -gamepad1.left_stick_x;
+        else if (gamepad1.x) {
+            DIRECTION_SWITCH_FB = -1;
+            DIRECTION_SWITCH_S = 1;
+        }
 
         double v1 = drive + strafe - twist;
         double v2 = drive - strafe + twist;
         double v3 = drive - strafe - twist;
         double v4 = drive + strafe + twist;
 
-        fl.setPower(v1 * SPEED_MULTIPLIER);
-        fr.setPower(v2 * SPEED_MULTIPLIER);
-        rl.setPower(v3 * SPEED_MULTIPLIER);
-        rr.setPower(v4 * SPEED_MULTIPLIER);
+        fl.setPower(v1 * SPEED_MULTIPLIER * DIRECTION_SWITCH_S);
+        fr.setPower(v2 * SPEED_MULTIPLIER * DIRECTION_SWITCH_FB);
+        rl.setPower(v3 * SPEED_MULTIPLIER * DIRECTION_SWITCH_S);
+        rr.setPower(v4 * SPEED_MULTIPLIER * DIRECTION_SWITCH_FB);
 
     }
 
@@ -208,8 +234,8 @@ public class TestDrive extends LinearOpMode {
 
         }
 
-        if (gamepad2.right_stick_y > 0 || gamepad2.right_stick_y < 0){
-        slide.setPower(gamepad2.right_stick_y); }
+        /* if (gamepad2.right_stick_y > 0 || gamepad2.right_stick_y < 0){
+        slide.setPower(gamepad2.right_stick_y); } */
 
         /* if (gamepad2.dpad_up) { //manual control
             slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -226,10 +252,10 @@ public class TestDrive extends LinearOpMode {
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             if (slide.getCurrentPosition() > HEIGHT_1){
-                slide.setPower(-LIFT_POWER);
+                slide.setPower(-SLIDE_POWER);
             }
             else if (slide.getCurrentPosition() < HEIGHT_1){
-                slide.setPower(LIFT_POWER);
+                slide.setPower(SLIDE_POWER);
             }
 
         }
@@ -238,21 +264,21 @@ public class TestDrive extends LinearOpMode {
             slide.setTargetPosition(HEIGHT_2);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             if (slide.getCurrentPosition() > HEIGHT_2) {
-                slide.setPower(-LIFT_POWER);
+                slide.setPower(-SLIDE_POWER);
             } else if (slide.getCurrentPosition() < HEIGHT_2) {
-                slide.setPower(LIFT_POWER);
+                slide.setPower(SLIDE_POWER);
 
             }
         }
 
-        else if (gamepad2.a) { //Height 2
+        else if (gamepad2.a) { //zero position
             slide.setTargetPosition(-15);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             if (slide.getCurrentPosition() > -15) {
-                slide.setPower(-LIFT_POWER);
+                slide.setPower(-SLIDE_POWER);
             } else if (slide.getCurrentPosition() < -15) {
-                slide.setPower(LIFT_POWER);
+                slide.setPower(SLIDE_POWER);
 
             }
         }

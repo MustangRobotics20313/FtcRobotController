@@ -23,6 +23,7 @@ import java.util.List;
 
 
 @Autonomous(name = "Auton_April", group = "Concept")
+@Disabled
 
 
 public class Auton_April extends LinearOpMode {

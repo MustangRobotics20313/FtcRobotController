@@ -43,16 +43,15 @@ public class Auton_BF extends LinearOpMode {
 
 
     private Servo servoAuton;
-    private Servo servoBoard;
+
 
 
     @Override
     public void runOpMode() {
 
         servoAuton = hardwareMap.get(Servo.class, "servoAuton");
-        servoBoard = hardwareMap.get(Servo.class, "servoBoard");
+
         servoAuton.scaleRange(0,1);
-        servoBoard.scaleRange(0,1);
 
         initTfod();
 
@@ -77,14 +76,14 @@ public class Auton_BF extends LinearOpMode {
 
         if (opModeIsActive() && !isStopRequested()) {
             while (opModeIsActive()) {
-                visionPortal.close();
+
 
                 SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
                 Pose2d startPose = new Pose2d(0, 0, (Math.toRadians(90)));
 
-                Vector2d leftSpike = new Vector2d(-4, 30);
-                Vector2d middleSpike = new Vector2d(0, 38);
-                Vector2d rightSpike = new Vector2d(8.25, 34);
+                Vector2d leftSpike = new Vector2d(-4, 22);
+                Vector2d middleSpike = new Vector2d(-1.5, 37);
+                Vector2d rightSpike = new Vector2d(8.25, 35);
 
                 Vector2d leftBoard = new Vector2d(-11.5 , 97.5);
                 Vector2d middleBoard = new Vector2d(-87.5, 21);
@@ -98,20 +97,15 @@ public class Auton_BF extends LinearOpMode {
 
 
                     TrajectorySequence dropLeftSpike = drive.trajectorySequenceBuilder(startPose)
-                            .addTemporalMarker(1, () ->{servoBoard.setPosition(0.72);})
-                            .forward(12)
+                            .forward(4)
                             .splineTo(leftSpike, Math.toRadians(180))
                             .waitSeconds(0.5)
-                            .forward(5)
-                            .forward(-8)
-                            .strafeRight(1.75)
                             .build();
 
                     drive.followTrajectorySequence(dropLeftSpike);
 
-                    servoAuton.setPosition(0.83);
-                    sleep(2000);
-                    //servoAuton.setPosition(0);
+                    servoAuton.setPosition(0.85);
+                    sleep(1500);
 
                     drive.setPoseEstimate(startPose);
                     TrajectorySequence adjustLeft = drive.trajectorySequenceBuilder(startPose)
@@ -163,14 +157,13 @@ public class Auton_BF extends LinearOpMode {
 
                     TrajectorySequence dropMiddleSpike = drive.trajectorySequenceBuilder(startPose)
                             .splineTo(middleSpike, Math.toRadians(90))
-                            .forward(-8)
+                            .forward(-7)
                             .build();
 
                     drive.followTrajectorySequence(dropMiddleSpike);
 
-                    servoAuton.setPosition(0.83);
-                    sleep(2000);
-                    //servoAuton.setPosition(0);
+                    servoAuton.setPosition(0.85);
+                    sleep(1500);
 
                     drive.setPoseEstimate(startPose);
                     TrajectorySequence adjustMiddle = drive.trajectorySequenceBuilder(startPose)
@@ -183,7 +176,7 @@ public class Auton_BF extends LinearOpMode {
                     /* drive.setPoseEstimate(startPose);
                     TrajectorySequence boardMiddle = drive.trajectorySequenceBuilder(startPose)
                             .addTemporalMarker(1, () ->
-                            { servoAuton.setPosition(0);
+                            { lift();
                               servoBoard.setPosition(0.72);})
                             .turn(Math.toRadians(90))
                             .forward(50)
@@ -227,27 +220,24 @@ public class Auton_BF extends LinearOpMode {
 
                     TrajectorySequence dropRightSpike = drive.trajectorySequenceBuilder(startPose)
                             .splineTo(rightSpike, Math.toRadians(0))
-                            .waitSeconds(0.5)
-                            .forward(5)
-                            .forward(-9)
+                            .forward(-7)
                             .build();
 
                     drive.followTrajectorySequence(dropRightSpike);
 
-                    servoAuton.setPosition(0.87);
-                    sleep(2000);
-                    //servoAuton.setPosition(0);
+                    servoAuton.setPosition(0.85);
+                    sleep(1500);
 
-                    drive.setPoseEstimate(startPose);
+                  /*  drive.setPoseEstimate(startPose);
                     TrajectorySequence adjustRight = drive.trajectorySequenceBuilder(startPose)
                             .forward(-4)
                             .build();
 
                     drive.followTrajectorySequence(adjustRight);
 
-                    servoAuton.setPosition(0);
+                    /* servoAuton.setPosition(0);
                     servoBoard.setPosition(0.72);
-                    sleep(2000);
+                    sleep(2000);*/
 
                     /* drive.setPoseEstimate(startPose);
                     TrajectorySequence boardRight = drive.trajectorySequenceBuilder(startPose)

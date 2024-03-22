@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
@@ -43,16 +44,24 @@ public class Auton_BC extends LinearOpMode {
 
 
     private Servo servoAuton;
-    private Servo servoBoard;
+    private Servo servoRotate;
+    private Servo servoPixel;
+    private DcMotor slide;
 
 
     @Override
     public void runOpMode() {
 
+        slide = hardwareMap.get(DcMotor.class, "slide");
         servoAuton = hardwareMap.get(Servo.class, "servoAuton");
-        servoBoard = hardwareMap.get(Servo.class, "servoBoard");
+        servoRotate = hardwareMap.get(Servo.class, "servoRotate");
+        servoPixel = hardwareMap.get(Servo.class, "servoPixel");
         servoAuton.scaleRange(0,1);
-        servoBoard.scaleRange(0,1);
+        servoRotate.scaleRange(0,1);
+        servoPixel.scaleRange(0,1);
+
+        slide.setDirection(DcMotor.Direction.REVERSE);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         initTfod();
 
@@ -77,20 +86,20 @@ public class Auton_BC extends LinearOpMode {
 
         if (opModeIsActive() && !isStopRequested()) {
             while (opModeIsActive()) {
-                visionPortal.close();
+
+                servoPixel.setPosition(0.1);
+                servoRotate.setPosition(0.85);
 
                 SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
                 Pose2d startPose = new Pose2d(0, 0, (Math.toRadians(90)));
 
-                Vector2d leftSpike = new Vector2d(-3, 31);
-                Vector2d middleSpike = new Vector2d(0, 36.75);
-                Vector2d rightSpike = new Vector2d(8.25, 30);
+                Vector2d leftSpike = new Vector2d(-3, 32);
+                Vector2d middleSpike = new Vector2d(-4, 36.5);
+                Vector2d rightSpike = new Vector2d(3 , 33);
 
-                Vector2d leftBoard = new Vector2d(-6, 40);
-                Vector2d middleBoard = new Vector2d(-41.5, -4.5);
+                Vector2d leftBoard = new Vector2d(-14.5, 40.5);
+                Vector2d middleBoard = new Vector2d(-41, -2.5);
                 Vector2d rightBoard = new Vector2d(-2.5, -47);
-
-
 
                 drive.setPoseEstimate(startPose);
 
@@ -100,23 +109,26 @@ public class Auton_BC extends LinearOpMode {
                     TrajectorySequence dropLeftSpike = drive.trajectorySequenceBuilder(startPose)
                             .forward(12)
                             .splineTo(leftSpike, Math.toRadians(180))
-                            .waitSeconds(0.5)
-                            .forward(5)
-                            .forward(-6.25)
-                            .strafeRight(1.75)
+                            .forward(2)
+                            .forward(-2)
                             .build();
 
                     drive.followTrajectorySequence(dropLeftSpike);
 
-                    servoAuton.setPosition(0.87);
-                    sleep(2500);
+                    servoAuton.setPosition(0.85);
+                    sleep(1500);
 
 
                     drive.setPoseEstimate(startPose);
                     TrajectorySequence leftPixelBoard = drive.trajectorySequenceBuilder(startPose)
-                            .addTemporalMarker(2, () ->{servoAuton.setPosition(0);})
+                            .addTemporalMarker(2, () ->
+                            {servoAuton.setPosition(0);
+                                lift();})
+                            .addTemporalMarker(1000,() ->
+                            {servoRotate.setPosition(0.745);
+                                sleep(1000); })
                             .forward(-2)
-                            .strafeRight(15)
+                            .strafeLeft(15)
                             .forward(6.5)
                             .splineTo(leftBoard, Math.toRadians(90))
                             .build();
@@ -124,17 +136,22 @@ public class Auton_BC extends LinearOpMode {
                     drive.followTrajectorySequence(leftPixelBoard);
 
 
-                    servoBoard.setPosition(0.62);
+                    servoPixel.setPosition(0.4);
                     sleep(2000);
 
                     drive.setPoseEstimate(startPose);
-                    TrajectorySequence adjustMiddle = drive.trajectorySequenceBuilder(startPose)
+                    TrajectorySequence adjustLeft = drive.trajectorySequenceBuilder(startPose)
+                            .addTemporalMarker(0.5,() ->
+                            {servoRotate.setPosition(0.85);
+                                sleep(2000); })
+                            .addTemporalMarker(2,() ->
+                            { resetLift();
+                                sleep(1000); })
                             .forward(-4)
                             .strafeLeft(18)
-                            .forward(10)
                             .build();
 
-                    drive.followTrajectorySequence(adjustMiddle);
+                    drive.followTrajectorySequence(adjustLeft);
                     break;
 
                 }
@@ -149,13 +166,18 @@ public class Auton_BC extends LinearOpMode {
 
                     drive.followTrajectorySequence(dropMiddleSpike);
 
-                    servoAuton.setPosition(0.83);
-                    sleep(2000);
+                    servoAuton.setPosition(0.85);
+                    sleep(1500);
                     //servoAuton.setPosition(0);
 
                     drive.setPoseEstimate(startPose);
                     TrajectorySequence middlePixelBoard = drive.trajectorySequenceBuilder(startPose)
-                            .addTemporalMarker(2, () ->{servoAuton.setPosition(0);})
+                            .addTemporalMarker(2, () ->
+                            {servoAuton.setPosition(0);
+                            lift();})
+                            .addTemporalMarker(1000,() ->
+                            {servoRotate.setPosition(0.745);
+                            sleep(1000); })
                             .forward(-7)
                             .turn(Math.toRadians(90))
                             .splineTo(middleBoard, Math.toRadians(180))
@@ -163,15 +185,20 @@ public class Auton_BC extends LinearOpMode {
 
                     drive.followTrajectorySequence(middlePixelBoard);
 
-                    //servoAuton.setPosition(0);
-                    servoBoard.setPosition(0.62);
+                    servoPixel.setPosition(0.4);
                     sleep(2000);
 
                     drive.setPoseEstimate(startPose);
                     TrajectorySequence adjustMiddle = drive.trajectorySequenceBuilder(startPose)
+                            .addTemporalMarker(0.5,() ->
+                        {servoRotate.setPosition(0.85);
+                            sleep(2000); })
+                        .addTemporalMarker(2,() ->
+                        { resetLift();
+                            sleep(1000); })
                             .forward(-4)
                             .strafeLeft(24)
-                            .forward(10)
+                            .forward(6)
                             .build();
 
                     drive.followTrajectorySequence(adjustMiddle);
@@ -186,38 +213,47 @@ public class Auton_BC extends LinearOpMode {
                     TrajectorySequence dropRightSpike = drive.trajectorySequenceBuilder(startPose)
                             .splineTo(rightSpike, Math.toRadians(0))
                             .waitSeconds(0.5)
-                            .forward(5)
-                            .forward(-10)
                             .build();
 
                     drive.followTrajectorySequence(dropRightSpike);
 
-                    servoAuton.setPosition(0.83);
-                    sleep(2000);
+                    servoAuton.setPosition(0.85);
+                    sleep(1500);
                     //servoAuton.setPosition(0);
 
                     drive.setPoseEstimate(startPose);
                     TrajectorySequence rightPixelBoard = drive.trajectorySequenceBuilder(startPose)
-                            .addTemporalMarker(2, () ->{servoAuton.setPosition(0);})
+                            .addTemporalMarker(0.5,() ->
+                            {servoRotate.setPosition(0.84);
+                                sleep(2000); })
+                            .addTemporalMarker(2,() ->
+                            { resetLift();
+                                sleep(1000); })
                             .forward(-7)
                             .turn(Math.toRadians(180))
-                            .waitSeconds(0.5)
+                            .waitSeconds(0.25)
                             .splineTo(rightBoard, Math.toRadians(270))
                             .build();
 
                     drive.followTrajectorySequence(rightPixelBoard);
 
-                    servoBoard.setPosition(0.62);
+                    servoPixel.setPosition(0.4);
                     sleep(2000);
 
                     drive.setPoseEstimate(startPose);
-                    TrajectorySequence adjustMiddle = drive.trajectorySequenceBuilder(startPose)
+                    TrajectorySequence adjustRight = drive.trajectorySequenceBuilder(startPose)
+                            .addTemporalMarker(0.5,() ->
+                            {servoRotate.setPosition(0.85);
+                                sleep(2000); })
+                            .addTemporalMarker(2,() ->
+                            { resetLift();
+                                sleep(1000); })
                             .forward(-4)
                             .strafeLeft(30)
                             .forward(10)
                             .build();
 
-                    drive.followTrajectorySequence(adjustMiddle);
+                    drive.followTrajectorySequence(adjustRight);
 
                     break;
 
@@ -233,12 +269,18 @@ public class Auton_BC extends LinearOpMode {
 
                     drive.followTrajectorySequence(dropMiddleSpike);
 
-                    servoAuton.setPosition(0.83);
-                    sleep(2000);
+                    servoAuton.setPosition(0.85);
+                    sleep(1500);
                     //servoAuton.setPosition(0);
 
                     drive.setPoseEstimate(startPose);
                     TrajectorySequence middlePixelBoard = drive.trajectorySequenceBuilder(startPose)
+                            .addTemporalMarker(2, () ->
+                            {servoAuton.setPosition(0);
+                                lift();})
+                            .addTemporalMarker(1000,() ->
+                            {servoRotate.setPosition(0.745);
+                                sleep(1000); })
                             .forward(-7)
                             .turn(Math.toRadians(90))
                             .splineTo(middleBoard, Math.toRadians(180))
@@ -246,18 +288,25 @@ public class Auton_BC extends LinearOpMode {
 
                     drive.followTrajectorySequence(middlePixelBoard);
 
-                    servoAuton.setPosition(0);
-                    servoBoard.setPosition(0.80);
+                    servoPixel.setPosition(0.4);
                     sleep(2000);
 
                     drive.setPoseEstimate(startPose);
                     TrajectorySequence adjustMiddle = drive.trajectorySequenceBuilder(startPose)
-                            .forward(-2)
+                            .addTemporalMarker(0.5,() ->
+                            {servoRotate.setPosition(0.84);
+                                sleep(2000); })
+                            .addTemporalMarker(2,() ->
+                            { resetLift();
+                                sleep(1000); })
+                            .forward(-6)
+                            .strafeLeft(5)
                             .build();
 
                     drive.followTrajectorySequence(adjustMiddle);
 
                     break;
+
                 }
 
 
@@ -384,4 +433,25 @@ public class Auton_BC extends LinearOpMode {
         return (currentRecognitions.size());
     }
 
-}   // end class
+    public void lift(){
+
+            slide.setTargetPosition(900);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            slide.setPower(0.5);
+
+        }
+
+    public void resetLift(){
+
+        slide.setTargetPosition(-15);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        slide.setPower(-0.5);
+
+
+    }
+
+    }
+
+
+
+        // end class
